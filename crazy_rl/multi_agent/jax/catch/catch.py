@@ -41,6 +41,9 @@ class Catch(BaseParallelEnv):
         target_speed: float,
         multi_obj: bool = False,
         size: int = 2,
+        target_iteration: int = 0,
+        target_destination: jnp.ndarray = jnp.zeros(3),
+        zigzag: int = 1,
     ):
         """Catch environment for Crazyflies 2.
 
@@ -51,6 +54,9 @@ class Catch(BaseParallelEnv):
             target_speed: Distance traveled by the target at each timestep
             multi_obj: Whether to return a multi-objective reward
             size: Size of the map in meters
+            target_iteration: Number of target movements for Waypoint and Zigzag behaviors
+            target_destination: Coordinate of the point where the target must go for Waypoint beheviors
+            zigzag: To know whether the target goes right or left for the Zigzag behaviour
         """
         self.num_drones = num_drones
         self._target_location = init_target_location  # unique target location for all agents
@@ -58,6 +64,9 @@ class Catch(BaseParallelEnv):
         self.multi_obj = multi_obj
         self._init_flying_pos = init_flying_pos
         self.size = size
+        self.target_iteration = 4
+        self.target_destination = init_target_location
+        self.zigzag = 1
 
     @override
     def observation_space(self, agent: int) -> Space:
@@ -90,7 +99,15 @@ class Catch(BaseParallelEnv):
         prev_agent_locations = state.agents_locations
         prev_target_locations = state.target_location
 
-        # Mechanics of the target
+        """Mechanics of the target
+            1 - opposite direction
+            2 - random direction
+            2' - random direction when agents is too close to the target
+            3 - waypoint pattern
+            4 - zigzag evasion
+        """
+
+        # 1 - Opposite direction
 
         # mean of the agent's positions
         mean = jnp.zeros(3)
@@ -115,6 +132,112 @@ class Catch(BaseParallelEnv):
             jnp.array([-self.size, -self.size, CLOSENESS_THRESHOLD]),
             jnp.array([self.size, self.size, 3]),
         )
+
+        # end of Opposite direction
+
+        """# 2 - Random direction
+
+        # if the target is out of the map, put it back in the map
+        target_location = jnp.clip(
+            # go to the random direction
+            state.target_location + (random.uniform(key, (3,), minval=-1, maxval=1) * self.target_speed),
+            jnp.array([-self.size, -self.size, CLOSENESS_THRESHOLD]),
+            jnp.array([self.size, self.size, 3]),
+        )
+
+        # end of Random direction
+
+        """
+
+        """# 2' - random direction move when the agents is too close to the target
+
+        # mean of the agent's positions
+        mean = jnp.zeros(3)
+
+        for agent in range(self.num_drones):
+            mean += agents_locations[agent]
+
+        mean /= self.num_drones
+
+        dist = jnp.linalg.norm(mean - state.target_location[0])
+
+        surrounded = dist <= 0.2
+
+        # if the target is out of the map, put it back in the map
+        target_location = jnp.clip(
+            state.target_location
+            # if the mean of the agents is too close to the target, move the target in a random directio
+            + (surrounded * random.uniform(key, (3,), minval=-1, maxval=1)) * self.target_speed,
+            jnp.array([-self.size, -self.size, CLOSENESS_THRESHOLD]),
+            jnp.array([self.size, self.size, 3]),
+        )
+
+        # end of random direction move when the agents is too close to the target
+
+        """
+
+        """# 3 - Waypoint pattern
+
+        if self.target_iteration == 4:
+            self.target_destination = random.uniform(key, (3,), minval=-1, maxval=1)
+            self.target_iteration = 0
+        else:
+            self.target_iteration += 1
+
+        direction = self.target_destination - state.target_location
+        dist = jnp.linalg.norm(self.target_destination - state.target_location[0])
+
+        # if the target is out of the map, put it back in the map
+        target_location = jnp.clip(
+            state.target_location + direction / (dist + 0.0001) * self.target_speed,
+            jnp.array([-self.size, -self.size, CLOSENESS_THRESHOLD]),
+            jnp.array([self.size, self.size, 3]),
+        )
+
+        # end of Waypoint Patternn
+
+        """
+
+        """# 4 - Zigzag evasion
+
+        mean = jnp.zeros(3)
+        droit = jnp.zeros(3)
+
+        for agent in range(self.num_drones):
+            mean += agents_locations[agent]
+
+        mean /= self.num_drones
+
+        dist = jnp.linalg.norm(mean - state.target_location[0])
+        vect = state.target_location - mean
+
+        if self.target_iteration == 4:
+            self.zigzag = self.zigzag * -1
+            self.target_iteration = 0
+        else:
+            self.target_iteration += 1
+
+        if self.zigzag > 0: # right point
+            x = state.target_location[0][0] + dist * (vect[0][1] / (jnp.square(vect[0][0]*vect[0][0] + vect[0][1]*vect[0][1])))
+            y = state.target_location[0][1] + dist * (-vect[0][0] / (jnp.square(vect[0][0]*vect[0][0] + vect[0][1]*vect[0][1])))
+        else: # left point
+            x = state.target_location[0][0] + dist * (-vect[0][1] / (jnp.square(vect[0][0]*vect[0][0] + vect[0][1]*vect[0][1])))
+            y = state.target_location[0][1] + dist * (vect[0][0] / (jnp.square(vect[0][0]*vect[0][0] + vect[0][1]*vect[0][1])))
+
+        z = random.uniform(key, minval=-1, maxval=1)
+
+        dest = jnp.array([x, y, z])
+        final_direction = dest - state.target_location
+
+        # if the target is out of the map, put it back in the map
+        target_location = jnp.clip(
+            state.target_location + ((final_direction) / (dist + 0.0001) * self.target_speed),
+            jnp.array([-self.size, -self.size, CLOSENESS_THRESHOLD]),
+            jnp.array([self.size, self.size, 3]),
+        )
+
+        # end of Zigzag evasion
+        """
 
         return jdc.replace(
             state,
