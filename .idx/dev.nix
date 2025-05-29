@@ -7,8 +7,9 @@
   # Use https://search.nixos.org/packages to find packages
   packages = [
     # pkgs.go
-    pkgs.python311 # Uncomment this line
-    pkgs.python311Packages.pip # Uncomment this line
+    pkgs.python311
+    pkgs.python311Packages.pip
+    pkgs.poetry # Add this line
     # pkgs.nodejs_20
     # pkgs.nodePackages.nodemon
   ];
