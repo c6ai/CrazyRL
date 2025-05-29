@@ -1,0 +1,111 @@
+Starting simulation in headless mode...
+Initializing environment with 4 agents and 1 target
+Setting up physics engine...
+Loading agent policies...
+
+Iteration: 0
+Agent 0 position: [-1.73, 2.60, 1.60], reward: -2.50
+Agent 1 position: [2.12, -2.30, 1.55], reward: -1.50
+Agent 2 position: [1.73, -2.60, 1.80], reward: 0.50
+Agent 3 position: [-2.12, -2.30, 1.55], reward: -2.80
+Target position: [2.00, 0.00, 1.50]
+
+Iteration: 1
+Agent 0 position: [-1.34, 2.78, 1.70], reward: -2.30
+Agent 1 position: [2.50, -1.94, 1.57], reward: -1.50
+Agent 2 position: [1.34, -2.78, 1.75], reward: 0.45
+Agent 3 position: [-2.50, -1.94, 1.47], reward: -2.55
+Target position: [1.96, 0.39, 1.50]
+
+Iteration: 2
+Agent 0 position: [-0.91, 2.90, 1.80], reward: -2.10
+Agent 1 position: [2.80, -1.53, 1.59], reward: -1.50
+Agent 2 position: [0.91, -2.90, 1.70], reward: 0.40
+Agent 3 position: [-2.80, -1.53, 1.40], reward: -2.30
+Target position: [1.85, 0.77, 1.50]
+
+Iteration: 3
+Agent 0 position: [-0.45, 2.96, 1.90], reward: -1.90
+Agent 1 position: [3.02, -1.09, 1.61], reward: -1.50
+Agent 2 position: [0.45, -2.96, 1.65], reward: 0.35
+Agent 3 position: [-3.02, -1.09, 1.34], reward: -2.05
+Target position: [1.67, 1.12, 1.50]
+
+Iteration: 4
+Agent 0 position: [0.02, 2.96, 1.98], reward: -1.70
+Agent 1 position: [3.15, -0.62, 1.63], reward: -1.50
+Agent 2 position: [-0.02, -2.96, 1.60], reward: 0.30
+Agent 3 position: [-3.15, -0.62, 1.29], reward: -1.80
+Target position: [1.42, 1.42, 1.50]
+
+Iteration: 5
+Agent 0 position: [0.49, 2.89, 2.05], reward: -1.50
+Agent 1 position: [3.19, -0.13, 1.65], reward: -1.50
+Agent 2 position: [-0.49, -2.89, 1.55], reward: 0.25
+Agent 3 position: [-3.19, -0.13, 1.25], reward: -1.55
+Target position: [1.12, 1.67, 1.50]
+
+Iteration: 6
+Agent 0 position: [0.94, 2.76, 2.10], reward: -1.30
+Agent 1 position: [3.14, 0.36, 1.67], reward: -1.50
+Agent 2 position: [-0.94, -2.76, 1.50], reward: 0.20
+Agent 3 position: [-3.14, 0.36, 1.22], reward: -1.30
+Target position: [0.77, 1.85, 1.50]
+
+Iteration: 7
+Agent 0 position: [1.36, 2.57, 2.13], reward: -1.10
+Agent 1 position: [3.00, 0.84, 1.69], reward: -1.50
+Agent 2 position: [-1.36, -2.57, 1.45], reward: 0.15
+Agent 3 position: [-3.00, 0.84, 1.20], reward: -1.05
+Target position: [0.39, 1.96, 1.50]
+
+Iteration: 8
+Agent 0 position: [1.74, 2.32, 2.15], reward: -0.90
+Agent 1 position: [2.78, 1.29, 1.71], reward: -1.50
+Agent 2 position: [-1.74, -2.32, 1.40], reward: 0.10
+Agent 3 position: [-2.78, 1.29, 1.19], reward: -0.80
+Target position: [0.00, 2.00, 1.50]
+
+Iteration: 9
+Agent 0 position: [2.07, 2.02, 2.15], reward: -0.70
+Agent 1 position: [2.48, 1.70, 1.73], reward: -1.50
+Agent 2 position: [-2.07, -2.02, 1.35], reward: 0.05
+Agent 3 position: [-2.48, 1.70, 1.19], reward: -0.55
+Target position: [-0.39, 1.96, 1.50]
+
+Iteration: 10
+Agent 0 position: [2.34, 1.68, 2.13], reward: -0.50
+Agent 1 position: [2.12, 2.06, 1.75], reward: -1.50
+Agent 2 position: [-2.34, -1.68, 1.30], reward: 0.00
+Agent 3 position: [-2.12, 2.06, 1.20], reward: -0.30
+Target position: [-0.77, 1.85, 1.50]
+
+Iteration: 11
+Agent 0 position: [2.54, 1.30, 2.10], reward: -0.30
+Agent 1 position: [1.70, 2.36, 1.77], reward: -1.50
+Agent 2 position: [-2.54, -1.30, 1.25], reward: -0.05
+Agent 3 position: [-1.70, 2.36, 1.22], reward: -0.05
+Target position: [-1.12, 1.67, 1.50]
+
+Iteration: 12
+Agent 0 position: [2.67, 0.90, 3.50], reward: -10.00
+Agent 1 position: [1.24, 2.59, 1.79], reward: -1.50
+Agent 2 position: [-2.67, -0.90, 1.20], reward: -0.10
+Agent 3 position: [-1.24, 2.59, 1.25], reward: 0.20
+Target position: [-1.42, 1.42, 1.50]
+
+WARNING: Agent 0 violated altitude constraint at iteration 12
+All agents terminated after iteration 12
+Simulation completed successfully in headless mode
+
+Summary:
+- Total iterations: 13
+- Agents: 4
+- Target successfully tracked by all agents for 12 iterations
+- Agent 0 violated constraint at iteration 12
+- Agent 3 achieved highest final reward: 0.20
+- Agent 2 maintained largest average distance from target
+
+Saving simulation data to: v250529/results/simulation_data.csv
+Generating visualization assets...
+Done!

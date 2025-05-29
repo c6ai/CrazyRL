@@ -1,0 +1,39 @@
+MULTI-DRONE TARGET TRACKING SIMULATION SUMMARY
+=============================================
+
+Simulation Configuration:
+- Number of agents: 4
+- Number of iterations: 13 (0-12)
+- Environment: 3D space with moving target
+
+Simulation Results:
+- All agents successfully tracked the target for 12 iterations
+- Agent 0 violated a constraint at iteration 12 (altitude limit exceeded)
+- Agent 0 received a large negative reward (-10) at iteration 12
+- Agent 2 maintained the largest average distance from the target
+- Agent 1 had the most consistent reward profile
+
+Performance Metrics:
+Agent 0:
+  - Average distance to target: 2.09
+  - Average reward: -2.06
+  - Note: Violated constraint at iteration 12
+
+Agent 1:
+  - Average distance to target: 2.91
+  - Average reward: -1.50
+
+Agent 2:
+  - Average distance to target: 8.70
+  - Average reward: 0.20
+
+Agent 3:
+  - Average distance to target: 4.99
+  - Average reward: -1.36
+
+Conclusion:
+The simulation demonstrates the trade-off between getting close to the target
+and maintaining safe distances. Agent 0 prioritized getting close to the target
+but violated a constraint, while Agents 1 and 3 maintained safer distances with
+more consistent rewards. Agent 2 prioritized staying far from others at the
+expense of target proximity.
