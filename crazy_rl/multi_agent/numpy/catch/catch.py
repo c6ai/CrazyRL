@@ -250,19 +250,39 @@ class Catch(BaseParallelEnv):
 if __name__ == "__main__":
     parallel_env = Catch(
         drone_ids=np.array([0, 1, 2, 3]),
-        render_mode="human",
+        render_mode=None,  # Changed from "human" to None to run in headless mode
         init_flying_pos=np.array([[0, 0, 1], [1, 1, 1], [0, 1, 1], [2, 2, 1]]),
         init_target_location=np.array([1, 1, 2.5]),
         target_speed=0.1,
     )
 
     observations, infos = parallel_env.reset()
-
-    while parallel_env.agents:
+    
+    print("Starting simulation in headless mode...")
+    iteration = 0
+    max_iterations = 100  # Limit the number of iterations
+    
+    while parallel_env.agents and iteration < max_iterations:
         actions = {
             agent: parallel_env.action_space(agent).sample() for agent in parallel_env.agents
         }  # this is where you would insert your policy
         observations, rewards, terminations, truncations, infos = parallel_env.step(actions)
-        parallel_env.render()
-        print("obs", observations, "reward", rewards)
+        
+        # No rendering in headless mode
+        print(f"Iteration {iteration}:")
+        print("  Rewards:", rewards)
+        
+        # Print positions of agents and target if there are still active agents
+        if parallel_env.agents:
+            # Print positions of agents
+            for agent in parallel_env.agents:
+                print(f"  {agent} position: {observations[agent][:3]}")
+            
+            # Print target position using the first active agent's observation
+            first_agent = list(parallel_env.agents)[0]
+            print(f"  Target position: {observations[first_agent][3:6]}")
+        else:
+            print("  All agents terminated.")
+        
+        iteration += 1
         time.sleep(0.02)
