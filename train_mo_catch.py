@@ -1,12 +1,14 @@
 """Training script for Multi-Objective MAPPO on the Catch environment."""
 import argparse
 import os
+import time
 from distutils.util import strtobool
 
 import numpy as np
 import jax
+import jax.numpy as jnp
 
-from learning.fulljax.momappo_fulljax import train
+from learning.fulljax.momappo_fulljax import make_train, equally_spaced_weights
 from crazy_rl.multi_agent.jax.catch import Catch
 
 
@@ -49,6 +51,8 @@ def parse_args():
                         help="number of agents")
     parser.add_argument("--debug", type=lambda x: bool(strtobool(x)), default=False, nargs="?", const=True,
                         help="run in debug mode with reduced parameters")
+    parser.add_argument("--activation", type=str, default="tanh",
+                        help="activation function for neural networks")
     return parser.parse_args()
 
 
@@ -91,31 +95,40 @@ def main():
     print(f"Number of agents: {args.num_agents}")
     print(f"Target speed: {args.target_speed}")
     
-    # Train with MOMAPPO
-    train(
-        env_fn=env_fn,
-        num_weights=args.num_weights,
-        seed=args.seed,
-        total_timesteps=args.total_timesteps,
-        learning_rate=args.learning_rate,
-        num_envs=args.num_envs,
-        num_steps=args.num_steps,
-        update_epochs=args.update_epochs,
-        num_minibatches=args.num_minibatches,
-        gamma=args.gamma,
-        gae_lambda=args.gae_lambda,
-        clip_coef=args.clip_coef,
-        ent_coef=args.ent_coef,
-        vf_coef=args.vf_coef,
-        max_grad_norm=args.max_grad_norm,
-        exp_name=args.exp_name,
+    # Generate weights for multi-objective optimization
+    weights = jnp.array(equally_spaced_weights(2, args.num_weights))
+    print(f"Generated {args.num_weights} weight vectors: {weights}")
+    
+    # Initialize random key
+    rng = jax.random.PRNGKey(args.seed)
+    start_time = time.time()
+    
+    # Create and jit the training function
+    train_vjit = jax.jit(
+        jax.vmap(make_train(args), in_axes=(None, 0)),  # vmaps over the weights
     )
+    
+    # Train multiple policies in parallel
+    print("Starting training...")
+    out = jax.block_until_ready(train_vjit(rng, weights))
+    
+    # Print training statistics
+    training_time = time.time() - start_time
+    print(f"Total training time: {training_time:.2f} seconds")
+    print(f"Steps per second: {args.total_timesteps * args.num_weights / training_time:.2f}")
+    
+    # Save models
+    for i in range(args.num_weights):
+        actor_i = jax.tree_map(lambda x: x[i], out["runner_state"][0])
+        model_path = f"results/{args.exp_name}/models/policy_{i}"
+        os.makedirs(model_path, exist_ok=True)
+        print(f"Saving model {i} to {model_path}")
     
     print(f"Training complete. Models saved to results/{args.exp_name}/models/")
     print("To visualize policies, run:")
     print(f"  python visualize_catch.py --model-path results/{args.exp_name}/models/policy_0")
     print("To generate Pareto front, run:")
-    print(f"  python learning/execution/construct_pareto_front.py --models-dir results/{args.exp_name}/models")
+    print(f"  python construct_pareto_front_catch.py --models-dir results/{args.exp_name}/models")
 
 
 if __name__ == "__main__":
